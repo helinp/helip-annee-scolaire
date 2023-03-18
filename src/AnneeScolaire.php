@@ -54,6 +54,7 @@ class AnneeScolaire
 
             // Si la date de début est un objet DateTime, on vérifie qu'elle est valide
         } elseif ($start instanceof DateTime) {
+            $start = clone $start; // On clone l'objet pour éviter de modifier l'objet passé en paramètre
             $this->isEntreAoutEtDecembre($start) ? $start : $start->modify('-1 year');
             $this->dateDebut = $this->calculateAnneeScolaireDateDebut($start->format('Y'));
         } else {
