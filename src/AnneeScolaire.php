@@ -61,7 +61,7 @@ class AnneeScolaire
                 de DateTimeInterface ou une chaîne de caractères valide'
             );
         }
-    
+
         $this->dateDebut = $startDateTime;
         $this->dateFin = $this->calculateAnneeScolaireDateFin($this->dateDebut->format('Y'));
         $this->anneeScolaire = $this->dateDebut->format('Y') . '-' . $this->dateFin->format('Y');
@@ -102,16 +102,37 @@ class AnneeScolaire
      */
     public static function returnDebutAnneeScolaireFromDate(DateTime $date): DateTime
     {
-        $date = clone $date;
-        self::isEntreAoutEtDecembre($date) ? $date : $date->modify('-1 year');
-        return self::calculateAnneeScolaireDateDebut($date->format('Y'));
+        return self::calculateDebutFinAnneeScolaireFromDate($date, true);
     }
 
+    /**
+     * Retourne la date de fin de l'année scolaire à partir d'une date donnée
+     *
+     * @param DateTime $date
+     * @return DateTime
+     */
     public static function returnFinAnneeScolaireFromDate(DateTime $date): DateTime
+    {
+        return self::calculateDebutFinAnneeScolaireFromDate($date, false);
+    }
+
+    /**
+     * Retourne la date de début ou de fin de l'année scolaire à partir d'une date donnée
+     *
+     * @param DateTime $date
+     * @param bool $isDebut
+     * @return DateTime
+     */
+    private static function calculateDebutFinAnneeScolaireFromDate(DateTime $date, bool $isDebut = true): DateTime
     {
         $date = clone $date;
         self::isEntreAoutEtDecembre($date) ? $date : $date->modify('-1 year');
-        return self::calculateAnneeScolaireDateFin($date->format('Y'));
+
+        if ($isDebut) {
+            return self::calculateAnneeScolaireDateDebut($date->format('Y'));
+        } else {
+            return self::calculateAnneeScolaireDateFin($date->format('Y'));
+        }
     }
 
     /**
