@@ -40,31 +40,29 @@ class AnneeScolaire
      * AnneeScolaire constructor.
      *
      * Accepte une date de début de l'année scolaire sous forme YYYY-YYYY
-     * ou dun objet DateTime
+     * ou d'un objet DateTime
+     * Si aucun paramètre n'est passé, utilise la date du jour
      *
-     * @param DateTime|String $start
+     * @param DateTime|String|null $start
      * @param array $config
      * @throws \InvalidArgumentException
      */
-    public function __construct(string|DateTime $start)
+    public function __construct(string|DateTime|null $start = null)
     {
-        // Si la date de début est une chaîne de caractères XXXX-XXXX, on vérifie qu'elle est valide
-        if (is_string($start) && $this->isAnneeScolaireValid($start)) {
-            $this->dateDebut = $this->calculateAnneeScolaireDateDebut(substr($start, 0, 4));
-
-            // Si la date de début est un objet DateTime, on vérifie qu'elle est valide
+        if (is_null($start)) {
+            $startDateTime = self::returnDebutAnneeScolaireFromDate(new DateTime());
+        } elseif (is_string($start) && self::isAnneeScolaireValid($start)) {
+            $startDateTime = self::calculateAnneeScolaireDateDebut(substr($start, 0, 4));
         } elseif ($start instanceof DateTime) {
-            $start = clone $start; // On clone l'objet pour éviter de modifier l'objet passé en paramètre
-            $this->isEntreAoutEtDecembre($start) ? $start : $start->modify('-1 year');
-            $this->dateDebut = $this->calculateAnneeScolaireDateDebut($start->format('Y'));
+            $startDateTime = self::returnDebutAnneeScolaireFromDate($start);
         } else {
             throw new \InvalidArgumentException(
                 'La date de début de l\'année scolaire doit être une instance 
                 de DateTimeInterface ou une chaîne de caractères valide'
             );
         }
-
-        // Calcul de la date de fin de l'année scolaire
+    
+        $this->dateDebut = $startDateTime;
         $this->dateFin = $this->calculateAnneeScolaireDateFin($this->dateDebut->format('Y'));
         $this->anneeScolaire = $this->dateDebut->format('Y') . '-' . $this->dateFin->format('Y');
     }
