@@ -39,6 +39,12 @@ class AnneeScolaireTest extends TestCase
         $this->assertEquals('1991-06-28', $anneeScolaire->getDateFin()->format('Y-m-d'));
     }
 
+    public function testConstructNull()
+    {
+        $anneeScolaire = new AnneeScolaire();
+        $this->assertInstanceOf(AnneeScolaire::class, $anneeScolaire);
+    }
+
     public function testgetAnneeScolaire()
     {
         $anneeScolaire = new AnneeScolaire('2022-2023');
