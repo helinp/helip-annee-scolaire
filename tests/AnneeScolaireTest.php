@@ -3,6 +3,7 @@
 namespace Helip\AnneeScolaire\Tests;
 
 use DateTime;
+use DateTimeZone;
 use Helip\AnneeScolaire\AnneeScolaire;
 use PHPUnit\Framework\TestCase;
 
@@ -67,15 +68,40 @@ class AnneeScolaireTest extends TestCase
 
     public function testisEntreAoutEtDecembre()
     {
-        $this->assertTrue(AnneeScolaire::isEntreAoutEtDecembre(new \DateTime('2022-08-01')), 'Le 1er août 2022 est entre août et décembre');
-        $this->assertTrue(AnneeScolaire::isEntreAoutEtDecembre(new \DateTime('2022-12-31')), 'Le 31 décembre 2022 est entre août et décembre');
-        $this->assertFalse(AnneeScolaire::isEntreAoutEtDecembre(new \DateTime('2022-07-31')), 'Le 31 juillet 2022 n\'est pas entre août et décembre');
-        $this->assertFalse(AnneeScolaire::isEntreAoutEtDecembre(new \DateTime('2022-01-01')), 'Le 1er janvier 2022 n\'est pas entre août et décembre');
+        $this->assertTrue(AnneeScolaire::isEntreAoutEtDecembre(new DateTime('2022-08-01')), 'Le 1er août 2022 est entre août et décembre');
+        $this->assertTrue(AnneeScolaire::isEntreAoutEtDecembre(new DateTime('2022-12-31')), 'Le 31 décembre 2022 est entre août et décembre');
+        $this->assertFalse(AnneeScolaire::isEntreAoutEtDecembre(new DateTime('2022-07-31')), 'Le 31 juillet 2022 n\'est pas entre août et décembre');
+        $this->assertFalse(AnneeScolaire::isEntreAoutEtDecembre(new DateTime('2022-01-01')), 'Le 1er janvier 2022 n\'est pas entre août et décembre');
     }
 
     public function testReturnDebutAnneeScolaireFromDate()
     {
-        $this->assertEquals(new \DateTime('2022-08-29'), AnneeScolaire::returnDebutAnneeScolaireFromDate(new \DateTime('2022-10-29')), 'Le 29 octobre 2022 fait partie de l\'année scolaire qui débute le 2022-08-29');
-        $this->assertEquals(new \DateTime('2022-08-29'), AnneeScolaire::returnDebutAnneeScolaireFromDate(new \DateTime('2023-05-29')), 'Le 29 mai 2023 fait partie de l\'année scolaire qui débute le 2022-08-29');
+        $this->assertEquals(new DateTime('2022-08-29', new DateTimeZone('Europe/Brussels')), AnneeScolaire::returnDebutAnneeScolaireFromDate(new DateTime('2022-10-29')), 'Le 29 octobre 2022 fait partie de l\'année scolaire qui débute le 2022-08-29');
+        $this->assertEquals(new DateTime('2022-08-29', new DateTimeZone('Europe/Brussels')), AnneeScolaire::returnDebutAnneeScolaireFromDate(new DateTime('2023-05-29')), 'Le 29 mai 2023 fait partie de l\'année scolaire qui débute le 2022-08-29');
+        $this->assertEquals(new DateTime('2022-08-29', new DateTimeZone('Europe/Brussels')), AnneeScolaire::returnDebutAnneeScolaireFromDate(new DateTime('2023-05-29', new DateTimeZone('Asia/Tokyo'))), 'Le 29 mai 2023 fait partie de l\'année scolaire qui débute le 2022-08-29');
+    }
+
+    public function testAnneeScolaireSuivante()
+    {
+        $anneeScolaire = new AnneeScolaire('2022-2023');
+        $this->assertEquals('2023-2024', $anneeScolaire->getAnneeScolaireSuivante());
+
+        $anneeScolaire = new AnneeScolaire('2020-2021');
+        $this->assertEquals('2021-2022', $anneeScolaire->getAnneeScolaireSuivante());
+
+        $anneeScolaire = new AnneeScolaire('2023-2024');
+        $this->assertEquals('2024-2025', $anneeScolaire->getAnneeScolaireSuivante());
+    }
+
+    public function testAnneeScolairePrecedente()
+    {
+        $anneeScolaire = new AnneeScolaire('2022-2023');
+        $this->assertEquals('2021-2022', $anneeScolaire->getAnneeScolairePrecedente());
+
+        $anneeScolaire = new AnneeScolaire('2020-2021');
+        $this->assertEquals('2019-2020', $anneeScolaire->getAnneeScolairePrecedente());
+
+        $anneeScolaire = new AnneeScolaire('2023-2024');
+        $this->assertEquals('2022-2023', $anneeScolaire->getAnneeScolairePrecedente());
     }
 }
