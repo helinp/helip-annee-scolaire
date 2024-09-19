@@ -3,6 +3,7 @@
 namespace Helip\AnneeScolaire;
 
 use DateTime;
+use DateTimeZone;
 
 /**
  * Cette classe représente une année scolaire
@@ -20,6 +21,11 @@ class AnneeScolaire
      * Nombre de semaines d'ouvertures dans une année scolaire
      */
     public const NOMBRE_SEMAINES_OUVERTURE = 37;
+
+    /**
+     * Fuseau horaire par défaut
+     */
+    public const TIME_ZONE = 'Europe/Brussels';
 
     /**
      * @var DateTime
@@ -50,10 +56,13 @@ class AnneeScolaire
     public function __construct(string|DateTime|null $start = null)
     {
         if (is_null($start)) {
-            $startDateTime = self::returnDebutAnneeScolaireFromDate(new DateTime());
+            $startDateTime = self::returnDebutAnneeScolaireFromDate(
+                new DateTime("now", new DateTimeZone(self::TIME_ZONE))
+            );
         } elseif (is_string($start) && self::isAnneeScolaireValid($start)) {
             $startDateTime = self::calculateAnneeScolaireDateDebut(substr($start, 0, 4));
         } elseif ($start instanceof DateTime) {
+            (clone $start)->setTimezone(new DateTimeZone(self::TIME_ZONE)); # Assure le bon fuseau horaire
             $startDateTime = self::returnDebutAnneeScolaireFromDate($start);
         } else {
             throw new \InvalidArgumentException(
@@ -102,6 +111,7 @@ class AnneeScolaire
      */
     public static function returnDebutAnneeScolaireFromDate(DateTime $date): DateTime
     {
+
         return self::calculateDebutFinAnneeScolaireFromDate($date, true);
     }
 
@@ -164,7 +174,7 @@ class AnneeScolaire
         // Avant le 31 aout 2022, l'année scolaire se termine le dernier jour ouvrable du mois juin
         if ($year < 2022) {
             // Dernier jour du mois de juin
-            $dateFin = new DateTime("@" . strtotime("last day of june " . $year + 1));
+            $dateFin = new DateTime("last day of june " . $year + 1, new DateTimeZone(self::TIME_ZONE));
 
             // Si le dernier jour du mois de juin est un samedi,
             // la date de fin de l'année scolaire est le vendredi précédent
@@ -197,7 +207,7 @@ class AnneeScolaire
         // Avant le 31 aout 2022, l'année scolaire se termine le premier jour ouvrable du mois de septembre
         if ($annee < 2022) {
             // Premier jour du mois de septembre
-            $dateDebut = new DateTime("@" . strtotime("first day of september $annee"));
+            $dateDebut = new DateTime("first day of september $annee", new DateTimeZone(self::TIME_ZONE));
 
             // Si le premier jour du mois de septembre est un samedi,
             // la date de début de l'année scolaire est le lundi suivant
@@ -215,7 +225,7 @@ class AnneeScolaire
         }
 
         // A partir de 2022, l'année scolaire commence le dernier lundi du mois d'août
-        $dateDebut = new DateTime("@" . strtotime("last monday of august $annee"));
+        $dateDebut = new DateTime("last monday of august $annee", new DateTimeZone(self::TIME_ZONE));
 
         // si cela est nécessaire pour que l'année scolaire comprenne le nombre de
         // 37 semaines d'ouverture hors vacances scolaires...
