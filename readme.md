@@ -53,4 +53,4 @@ Retourne l'année scolaire précédente sous forme YYYY-YYYY.
 
 ## License
 
-[GNU General Public License v3.0](https://choosealicense.com/licenses/gpl-3.0/)
+[GNU Lesser General Public License v3.0](https://choosealicense.com/licenses/lgpl-3.0/)
